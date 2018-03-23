@@ -1,0 +1,69 @@
+{
+    "english": 
+    {
+        "book" : "Hymnary","author": "","publisher": "",
+        "chapter": [
+            {
+            "num": 1,"title": "glory to God in the highest","author": "","composer": "",
+            "stanza": [{
+                "line": "Glory to God in the highest! Glory to God! Glory to God!\nGlory to God in the highest! Praise Him forever more.\nPraise Him from whom all blessings flow;\nPraise Him all creatures here below;\nPraise Him above ye heav'nly hosts;\nPraise Father, Son, and Holy Ghost.\nGlory to God in the highest! Glory to God in the highest!\nGlory! Glory! Glory! Glory! Glory to God in the highest!",
+                "chord": ""
+                }]
+            },
+            {
+                "num": 2,"title": "Holy, Holy, Holy","author": "","composer": "",
+                "stanza":[{
+                    "line": "Holy, Holy, Holy! Lord God Almighty!\nEarly in the morning our song shall rise to Thee;\nHoly, Holy, Holy! Merciful and Mighty!\nGod in Three Persons, blessed Trinity!",
+                    "chord": ""
+                    },
+                    {
+                    "line": "Holy, Holy, Holy! All the saints adore Thee,\nCasting down their golden crowns Around the glassy sea;\nCherubim and seraphim falling down before Thee,\nWhich wert and art, and evermore shalt be.",
+                    "chord": ""
+                    },
+                    {
+                    "line": "Holy, Holy, Holy! Tho’ the darkness hide Thee,\nTho’ the eye of sinful man Thy glory may not see,\nOnly Thou art holy; there is none beside Thee\nPerfect in power, in love, and purity.",
+                    "chord": ""
+                    },
+                    {
+                    "line": "Holy, Holy, Holy! Lord God Almighty!\nAll Thy works shall praise Thy name, In earth, and sky, and sea;\nHoly, Holy, Holy! Merciful and Mighty!\nGod in Three Persons, blessed Trinity!",
+                    "chord": ""
+                    }]
+            }
+        ]
+    },
+    "chinese": {
+        "book" : "聖徒詩歌",        "author": "",        "publisher": "",
+        "chapter": [
+            {
+            "num": 1,            "title": "榮耀歸於至高神",            "author": "",            "composer": "",
+            "stanza": [
+                {
+                "line": "榮耀歸與至高神！榮耀歸神！榮耀歸神！\n榮耀歸與至高神！讚美讚美不盡。\n讚美真神萬福源頭，\n天下萬有讚祂不休，\n天上眾軍和聲響應﹕\n讚美聖父、聖子、聖靈。\n榮耀歸與至高神！榮耀歸與至高神！\n榮耀，榮耀，榮耀，榮耀，榮耀歸與至高神！",
+                "chord": ""
+                }]
+            },
+            {
+                "num": 2,
+                "title": "聖哉，聖哉，聖哉",
+                "author": "",
+                "composer": "",
+                "stanza":[{
+                    "line":"聖哉，聖哉，聖哉，全能的主神！\n清晨我們歌聲穿雲透天而來；\n聖哉，聖哉，聖哉，全能而又慈愛，\n一神別三位，三位是一身！",
+                    "chord": ""
+                    },
+                    {
+                    "line": "聖哉、聖哉、聖哉，萬眾都敬你，\n投下黃金冠冕，圍繞玻璃之海；\n基路伯，撒拉弗，無不俯伏敬拜\n這昔在、今在、永遠常在的。",
+                    "chord": ""
+                    },
+                    {
+                    "line": "聖哉、聖哉、聖哉，黑暗雖藏你，\n有罪污穢的人雖不能見你身；\n但你仍是聖哉，你外再無別人\n能有這全愛、全潔與全力。",
+                    "chord": ""
+                    },
+                    {
+                    "line": "聖哉、聖哉、聖哉，全能的主神！\n你的造物讚美於地、於天、於海；\n聖哉、聖哉、聖哉，公義而又慈愛，\n一神別三位，三位是一身。",
+                    "chord": ""
+                    }]
+            }
+        ]
+    }
+}
