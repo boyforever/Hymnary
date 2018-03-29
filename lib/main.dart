@@ -42,15 +42,59 @@ class Contents extends StatefulWidget{
   ContentsState createState() => new ContentsState();
 }
 
-final _biggerFont = const TextStyle(fontSize: 16.0);
+final _biggerFont = const TextStyle(fontSize: 14.0);
 enum Language { english, chinese }
 final Map hymnBook = {"english": new List<Song>(), "chinese": new List<Song>()};
 final Map bookTitles = {"english": "Hymnary", "chinese": "聖徒詩歌"};
 
 class ContentsState extends State<Contents>{  
   double _fontScale = 1.0;
-  var _selectedIndex = 0;  
+  //var _selectedIndex = 0;  
   var _selectedLanguage = Language.english;  
+
+  void _switchLanguage(){ setState((){ _selectedLanguage = _selectedLanguage == Language.english ? Language.chinese : Language.english;}); }
+  void _decreaseFontScale(){ setState((){_fontScale = _fontScale * 0.9;}); }  
+  void _increaseFontScale(){ setState((){_fontScale = _fontScale * 1.1;}); }
+  
+  String _getEnumValue(String value) => value.toString().substring(value.toString().indexOf('.')+1); 
+  String _getLanguage() => _getEnumValue(_selectedLanguage.toString());   
+  void _setData(Map _library) {
+    for (var value in Language.values) {
+      var key = _getEnumValue(value.toString());
+      for(var i=0; i<_library[key]['chapter'].length; i++){
+        var _song = '';
+        for(int j=0; j<_library[key]['chapter'][i]['stanza'].length; j++){
+          if(_library[key]['chapter'][i]['stanza'].length > 1){
+            _song += '\n(' + (j+1).toString() + ')\n';
+          }
+          _song += _library[key]['chapter'][i]['stanza'][j].trim();
+        }
+        hymnBook[key].add(new Song(i+1, _library[key]['chapter'][i]['title'].toString().toUpperCase(), _song));
+      }
+    }
+  }
+
+  List<Widget> _showSelectedSong(int index){
+    List<Widget> w=[];
+    if (index < 0 || hymnBook[_getLanguage()].length == 0) return w;
+    //if (_selectedIndex <= 0) _selectedIndex = 0;
+    //if (hymnBook[_getLanguage()].length == 0) return w;
+    var _song = hymnBook[_getLanguage()][index];
+    if (_song == null) return w;
+    w.add(new Text( _song.number.toString() + ' ' + _song.title, textAlign: TextAlign.center,style: new TextStyle(fontFamily: "Rock Salt", fontSize: 14.0 * _fontScale, fontWeight: FontWeight.bold),));    
+    w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale),));
+    return w;
+  }
+
+  Widget _list(Song root){
+    return new ListTile(title: new Text(root.number.toString().padLeft(3) + ' - ' +root.title, style: _biggerFont,), onTap: (){
+      setState((){
+        // _selectedIndex = root.number - 1;
+        Navigator.of(context).pop();
+        _showSelectedSong(root.number - 1);
+      });
+    },);
+  }
 
   @override
   void initState() {
@@ -62,23 +106,6 @@ class ContentsState extends State<Contents>{
     });
   }
 
-  void _switchLanguage(){ setState((){ _selectedLanguage = _selectedLanguage == Language.english ? Language.chinese : Language.english;}); }
-  void _decreaseFontScale(){ setState((){_fontScale = _fontScale * 0.9;}); }  
-  void _increaseFontScale(){ setState((){_fontScale = _fontScale * 1.1;}); }
-  
-  String _getEnumValue(String value) => value.toString().substring(value.toString().indexOf('.')+1); 
-  String _getLanguage() => _getEnumValue(_selectedLanguage.toString());   
-
-  Widget _list(Song root){
-    return new ListTile(title: new Text(root.title, style: _biggerFont,), onTap: (){
-      setState((){
-        _selectedIndex = root.number - 1;
-        Navigator.of(context).pop();
-        _showSelectedSong();
-      });
-    },);
-  }
-
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = new TextEditingController();
@@ -88,11 +115,11 @@ class ContentsState extends State<Contents>{
       decoration: new InputDecoration(icon: new Icon(Icons.search, color: Colors.white,), labelText: bookTitles[_getLanguage()], labelStyle: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white)), 
       autocorrect: false, 
       autofocus: false, 
-      style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white),    
       onSubmitted: (String value){setState((){
-        if(value != ''){ _selectedIndex = int.parse(value) - 1;}
+        // if(value != ''){ _selectedIndex = int.parse(value) - 1;}
         _controller.clear();
-        _showSelectedSong();      
+        _showSelectedSong(value == ''? -1 : int.parse(value) - 1 );      
       });},
     );
 
@@ -100,7 +127,7 @@ class ContentsState extends State<Contents>{
       drawer: new Drawer(
         child: new ListView.builder(
           itemBuilder: (BuildContext context, int index) => _list(hymnBook[_getLanguage()][index]),
-          itemCount: hymnBook.length,
+          itemCount: 716,
         ),
       ),
       appBar: new AppBar(
@@ -111,35 +138,11 @@ class ContentsState extends State<Contents>{
           new IconButton(icon: new Icon(Icons.translate), onPressed: _switchLanguage),
         ],
       ),
-      body: new SingleChildScrollView(
+      body: new SingleChildScrollView( //consider pageview here
         child: new ListBody(
-          children: _showSelectedSong(), 
-        ),
+          children: _showSelectedSong(0),           
+        ),        
       )
     );
-  }
-
-  void _setData(Map _library) {
-    for (var value in Language.values) {
-      var key = _getEnumValue(value.toString());
-      for(var i=0; i<_library[key]['chapter'].length; i++){
-        var _song = '';
-        for(int j=0; j<_library[key]['chapter'][_selectedIndex]['stanza'].length; j++){
-          _song += '(' + (j+1).toString() + ')\n' + _library[key]['chapter'][i]['stanza'][j]['line'] + '\n' + _library[key]['chapter'][i]['stanza'][j]['chord'] + '\n';
-        }
-        hymnBook[key].add(new Song(i+1, _library[key]['chapter'][i]['title'].toString().toUpperCase(), _song));
-      }
-    }
-  }
-
-  List<Widget> _showSelectedSong(){
-    List<Widget> w=[];
-    if (_selectedIndex <= 0) _selectedIndex = 0;
-    if (hymnBook[_getLanguage()].length == 0) return w;
-    var _song = hymnBook[_getLanguage()][_selectedIndex];
-    if (_song == null) return w;
-    w.add(new Text( _song.number.toString() + ' ' + _song.title, textAlign: TextAlign.center,style: new TextStyle(fontFamily: "Rock Salt", fontSize: 18.0 * _fontScale, fontWeight: FontWeight.bold),));    
-    w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale),));
-    return w;
   }
 }
