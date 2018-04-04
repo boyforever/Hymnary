@@ -49,7 +49,7 @@ final Map bookTitles = {"english": "Hymnary", "chinese": "聖徒詩歌"};
 
 class ContentsState extends State<Contents>{  
   double _fontScale = 1.0;
-  //var _selectedIndex = 0;  
+  var _selectedSongIndex = 0;  
   var _selectedLanguage = Language.english;  
 
   void _switchLanguage(){ setState((){ _selectedLanguage = _selectedLanguage == Language.english ? Language.chinese : Language.english;}); }
@@ -77,21 +77,19 @@ class ContentsState extends State<Contents>{
   List<Widget> _showSelectedSong(int index){
     List<Widget> w=[];
     if (index < 0 || hymnBook[_getLanguage()].length == 0) return w;
-    //if (_selectedIndex <= 0) _selectedIndex = 0;
-    //if (hymnBook[_getLanguage()].length == 0) return w;
     var _song = hymnBook[_getLanguage()][index];
     if (_song == null) return w;
     w.add(new Text( _song.number.toString() + ' ' + _song.title, textAlign: TextAlign.center,style: new TextStyle(fontFamily: "Rock Salt", fontSize: 14.0 * _fontScale, fontWeight: FontWeight.bold),));    
-    w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale),));
+    w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale), textAlign: TextAlign.center,));
     return w;
   }
 
   Widget _list(Song root){
     return new ListTile(title: new Text(root.number.toString().padLeft(3) + ' - ' +root.title, style: _biggerFont,), onTap: (){
       setState((){
-        // _selectedIndex = root.number - 1;
         Navigator.of(context).pop();
-        _showSelectedSong(root.number - 1);
+        _selectedSongIndex = root.number - 1;
+        _showSelectedSong(_selectedSongIndex);
       });
     },);
   }
@@ -117,8 +115,8 @@ class ContentsState extends State<Contents>{
       autofocus: false, 
       style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white),    
       onSubmitted: (String value){setState((){
-        // if(value != ''){ _selectedIndex = int.parse(value) - 1;}
         _controller.clear();
+        _selectedSongIndex = value == ''? -1 : int.parse(value) - 1 ;
         _showSelectedSong(value == ''? -1 : int.parse(value) - 1 );      
       });},
     );
@@ -140,7 +138,7 @@ class ContentsState extends State<Contents>{
       ),
       body: new SingleChildScrollView( //consider pageview here
         child: new ListBody(
-          children: _showSelectedSong(0),           
+          children: _showSelectedSong(_selectedSongIndex),           
         ),        
       )
     );
