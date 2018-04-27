@@ -1,37 +1,17 @@
-import 'dart:async' show Future;
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 
-void main() => runApp(new MyApp());
+import 'class.dart';
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return new MaterialApp(
-      title: 'Hymnary',
-      theme: new ThemeData(primaryColor: Colors.blue,),
-      home: new Contents(storage: new ContentStorage(),),
+        title: 'Hymnary',
+        theme: new ThemeData(primaryColor: Colors.blue,),
+        home: new Contents(storage: new ContentStorage(),),      
     );
-  }
-}
-
-class Song {
-  Song(this.number, this.title, this.lyric);
-  final int number;
-  final String title;
-  final String lyric;
-}
-
-class ContentStorage {
-  Future<Map> readFile() async {
-    try{
-      String result = await rootBundle.loadString('assets/hymn.json');
-      return JSON.decode(result);
-    } catch(e) {
-      return null;
-    }
   }
 }
 
@@ -50,7 +30,7 @@ final Map bookTitles = {"english": "Hymnary", "chinese": "聖徒詩歌"};
 class ContentsState extends State<Contents>{  
   double _fontScale = 1.0;
   var _selectedSongIndex = 0;  
-  var _selectedLanguage = Language.english;  
+  var _selectedLanguage = Language.chinese;  
 
   void _switchLanguage(){ setState((){ _selectedLanguage = _selectedLanguage == Language.english ? Language.chinese : Language.english;}); }
   void _decreaseFontScale(){ setState((){_fontScale = _fontScale * 0.9;}); }  
@@ -64,28 +44,26 @@ class ContentsState extends State<Contents>{
       for(var i=0; i<_library[key]['chapter'].length; i++){
         var _song = '';
         for(int j=0; j<_library[key]['chapter'][i]['stanza'].length; j++){
-          if(_library[key]['chapter'][i]['stanza'].length > 1){
-            _song += '\n(' + (j+1).toString() + ')\n';
-          }
-          _song += _library[key]['chapter'][i]['stanza'][j].trim();
+          if(_library[key]['chapter'][i]['stanza'].length > 1){ _song += '(' + (j+1).toString() + ')\n'; }
+          _song += _library[key]['chapter'][i]['stanza'][j].trim() + '\n';
         }
         hymnBook[key].add(new Song(i+1, _library[key]['chapter'][i]['title'].toString().toUpperCase(), _song));
       }
     }
   }
 
-  List<Widget> _showSelectedSong(int index){
-    List<Widget> w=[];
+  Widget _showSelectedSong(int index){
+    Widget w;
     if (index < 0 || hymnBook[_getLanguage()].length == 0) return w;
     var _song = hymnBook[_getLanguage()][index];
     if (_song == null) return w;
-    w.add(new Text( _song.number.toString() + ' ' + _song.title, textAlign: TextAlign.center,style: new TextStyle(fontFamily: "Rock Salt", fontSize: 14.0 * _fontScale, fontWeight: FontWeight.bold),));    
-    w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale), textAlign: TextAlign.center,));
-    return w;
+    // w.add(new Text( _song.number.toString() + ' ' + _song.title, textAlign: TextAlign.center,style: new TextStyle(fontFamily: "Rock Salt", fontSize: 14.0 * _fontScale, fontWeight: FontWeight.bold),));    
+    // w.add(new Text( _song.lyric, style: new TextStyle(fontSize: 16.0 * _fontScale), textAlign: TextAlign.center,));
+    return new LyricCard(song: _song, fontSize: _fontScale * 14.0);
   }
 
   Widget _list(Song root){
-    return new ListTile(title: new Text(root.number.toString().padLeft(3) + ' - ' +root.title, style: _biggerFont,), onTap: (){
+    return new ListTile(title: new Text(root.number.toString().padLeft(3) + ' - ' + root.title, style: _biggerFont,), onTap: (){
       setState((){
         Navigator.of(context).pop();
         _selectedSongIndex = root.number - 1;
@@ -104,6 +82,7 @@ class ContentsState extends State<Contents>{
     });
   }
 
+    
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = new TextEditingController();
@@ -113,34 +92,49 @@ class ContentsState extends State<Contents>{
       decoration: new InputDecoration(icon: new Icon(Icons.search, color: Colors.white,), labelText: bookTitles[_getLanguage()], labelStyle: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white)), 
       autocorrect: false, 
       autofocus: false, 
-      style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white),    
+      style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.white),          
+      // onChanged: (String value){setState((){
+      //   _list((hymnBook[_getLanguage()].removeAt(int.parse(value) - 1)));
+      // });},
       onSubmitted: (String value){setState((){
         _controller.clear();
         _selectedSongIndex = value == ''? -1 : int.parse(value) - 1 ;
-        _showSelectedSong(value == ''? -1 : int.parse(value) - 1 );      
+        _showSelectedSong(_selectedSongIndex );      
       });},
     );
 
-    return new Scaffold(
-      drawer: new Drawer(
-        child: new ListView.builder(
-          itemBuilder: (BuildContext context, int index) => _list(hymnBook[_getLanguage()][index]),
-          itemCount: 716,
+    void _onTapDown(TapDownDetails details){
+
+    };
+
+    return new GestureDetector(
+      onTap: () => { 
+        // _selectedSongIndex = _controller.value.toString() == '' ? -1 : (int.parse(_controller.value.toString()) - 1)
+        // _showSelectedSong(_selectedSongIndex);
+        },
+      onTapDown: (TapDownDetails details)=>_onTapDown(details),      
+      child: 
+      new Scaffold(
+        drawer: new Drawer(
+          child: new ListView.builder(
+              shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) => _list(hymnBook[_getLanguage()][index]),
+                itemCount: 716,
+                ),
+          ),            
+        appBar: new AppBar(
+          title:  _inputBox,
+          actions: <Widget>[
+            new IconButton(icon: new Icon(Icons.add), onPressed: _increaseFontScale),
+            new IconButton(icon: new Icon(Icons.remove), onPressed: _decreaseFontScale),
+            new IconButton(icon: new Icon(Icons.translate), onPressed: _switchLanguage),
+          ],
         ),
-      ),
-      appBar: new AppBar(
-        title:  _inputBox,
-        actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.add), onPressed: _increaseFontScale),
-          new IconButton(icon: new Icon(Icons.remove), onPressed: _decreaseFontScale),
-          new IconButton(icon: new Icon(Icons.translate), onPressed: _switchLanguage),
-        ],
-      ),
-      body: new SingleChildScrollView( //consider pageview here
-        child: new ListBody(
-          children: _showSelectedSong(_selectedSongIndex),           
-        ),        
+        body: 
+        _showSelectedSong(_selectedSongIndex),
       )
     );
   }
 }
+
+void main() => runApp(new MyApp());
